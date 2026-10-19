@@ -271,7 +271,8 @@ html { scroll-behavior: smooth; }
   // Tarifs HT : [minimum, normal, chantier compliqué]
   const TARIFS = {
     impression: [7, 8, 9],                       // €/m²
-    bandes_placo: [7, 7, 7],                     // bandes et joints sur plaque de plâtre neuve
+    bandes_placo: [7, 7, 7],
+    plafond_neuf: [25, 25, 25],                  // plafond plaque neuve : ponçage, impression + 2 couches                     // bandes et joints sur plaque de plâtre neuve
     murs_pret: [20, 22, 25],                     // murs 2 couches, support prêt
     plafonds_pret: [22, 25, 28],                 // plafonds 2 couches, support prêt
     murs_prep: [23, 26, 30],                     // murs avec préparation légère
@@ -420,7 +421,9 @@ html { scroll-behavior: smooth; }
     const z = sf.type === 'mur' ? 'murs' : 'plafonds';
     if (sf.type === 'mur' && sf.finition === 'toile') return [['toile_verre'], 'toile de verre + peinture'];
     if (sf.etat === 'abime') return [[z + '_ratissage'], 'ratissage + impression + 2 couches'];
-    if (sf.etat === 'placo') return [['bandes_placo', 'impression', z + '_pret'], 'plaque neuve : bandes, impression + 2 couches'];
+    if (sf.etat === 'placo') return sf.type === 'mur'
+      ? [['bandes_placo', 'impression', 'murs_pret'], 'plaque neuve : bandes, impression + 2 couches']
+      : [['bandes_placo', 'plafond_neuf'], 'plaque neuve : bandes, ponçage, impression + 2 couches'];
     if (sf.etat === 'prep') return [[z + '_prep'], '2 couches, préparation légère'];
     return [[z + '_pret'], '2 couches, support prêt'];
   }
