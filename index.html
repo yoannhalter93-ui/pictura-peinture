@@ -110,6 +110,10 @@
   {
    "@type": "City",
    "name": "Quincieux"
+  },
+  {
+   "@type": "City",
+   "name": "Vonnas"
   }
  ],
  "sameAs": [
@@ -242,7 +246,7 @@
       <article class="service">
         <span class="chip" style="background: var(--sage)"></span>
         <h3>Pose de sols</h3>
-        <ul><li>Parquet massif et contrecollé</li><li>Stratifié, lames vinyle (LVT), PVC</li><li>Moquette</li><li>Ragréage, sous-couche, plinthes</li></ul>
+        <ul><li>Parquet massif et contrecollé</li><li>Stratifié, lames vinyle (LVT), PVC</li><li>Moquette</li><li>Béton ciré</li><li>Ragréage, sous-couche, plinthes</li></ul>
         <a class="more" href="/devis/">Estimer ces travaux →</a>
       </article>
     </div>
@@ -317,6 +321,7 @@
       <li>Pommiers</li>
       <li>Saint-Georges-de-Reneins</li>
       <li>Quincieux</li>
+      <li>Vonnas</li>
     </ul>
     <p class="lead">Votre commune n'est pas dans la liste ? Appelez-nous au <a href="tel:+33645563897">06 45 56 38 97</a>, on se déplace sûrement chez vous. <a href="/peintre-villefranche-sur-saone/">En savoir plus sur nos travaux à Villefranche-sur-Saône</a>.</p>
   </div>
@@ -354,19 +359,19 @@
   // Une photo : { src, titre, paysage? }   ·   Un avant/après : { avant, pendant?, apres, titre, paysage? }
   const R = 'realisations/';
   const REALISATIONS = [
-    { avant: R + 'escalier-ancien-avant.jpg', pendant: R + 'escalier-ancien-pendant.jpg', apres: R + 'escalier-ancien-apres.jpg', titre: 'Escalier ancien : décapage, teinte et vernis' },
-    { avant: R + 'cuisine-avant.jpg', apres: R + 'cuisine-apres.jpg', titre: 'Cuisine : murs remis à neuf et faïence repeinte', paysage: true },
+    { avant: R + 'escalier-ancien-avant.jpg', pendant: R + 'escalier-ancien-pendant.jpg', apres: R + 'escalier-ancien-apres.jpg', titre: 'Escalier ancien à Vonnas : décapage, teinte et vernis' },
+    { avant: R + 'cuisine-avant.jpg', apres: R + 'cuisine-apres.jpg', titre: 'Cuisine à Jassans-Riottier : murs remis à neuf et faïence repeinte', paysage: true },
     { avant: R + 'parquet-avant.jpg', apres: R + 'parquet-apres.jpg', titre: 'Parquet bâtons rompus : ponçage et vitrification' },
-    { avant: R + 'sdb-avant.jpg', apres: R + 'sdb-apres.jpg', titre: 'Salle de bain : finitions peinture sur placo neuf', paysage: true },
+    { avant: R + 'sdb-avant.jpg', apres: R + 'sdb-apres.jpg', titre: 'Salle de bain à Villefranche-sur-Saône : pose des revêtements muraux et du sol, peinture', paysage: true },
     { avant: R + 'bardage-avant.jpg', apres: R + 'bardage-apres.jpg', titre: 'Bardage bois : décapage et remise en peinture', paysage: true },
     { avant: R + 'terrasse-avant.jpg', apres: R + 'terrasse-apres.jpg', titre: 'Terrasse bois : rénovation complète' },
     { src: R + 'couloir-vert.jpg', titre: 'Couloir : boiseries en vert profond' },
-    { src: R + 'salon-arches.jpg', titre: 'Salon : peinture décorative en arches', paysage: true },
+    { src: R + 'salon-arches.jpg', titre: 'Salon à Gleizé : peinture décorative en arches', paysage: true },
     { src: R + 'palier-escalier.jpg', titre: 'Palier : murs, plafond rampant et rampe' },
-    { src: R + 'escalier-anthracite.jpg', titre: 'Escalier : marches et contremarches anthracite' },
-    { src: R + 'bureau-rayures.jpg', titre: 'Coin bureau : rayures peintes bordeaux et blanc', paysage: true },
+    { src: R + 'escalier-anthracite.jpg', titre: 'Escalier en béton ciré anthracite' },
+    { src: R + 'bureau-rayures.jpg', titre: 'Coin bureau à Jassans-Riottier : papier peint rayé rouge et blanc', paysage: true },
     { src: R + 'mur-terracotta.jpg', titre: 'Chambre : mur d\'accent terracotta' },
-    { src: R + 'palier-anthracite.jpg', titre: 'Palier et escalier : finition anthracite' },
+    { src: R + 'palier-anthracite.jpg', titre: 'Palier et escalier en béton ciré' },
     { src: R + 'chambre-vert-sauge.jpg', titre: 'Chambre : mur d\'accent vert sauge', paysage: true },
     { src: R + 'parement-pierre.jpg', titre: 'Séjour : pose de parement pierre', paysage: true },
     { src: R + 'entree-vert-blanc.jpg', titre: 'Entrée : murs blancs et boiseries vertes', paysage: true },
