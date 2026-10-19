@@ -164,3 +164,7 @@ footer a { color: #fff; }
 .ba .ba-pair { flex: 1; }
 .ba-land .ba-side { aspect-ratio: auto; min-height: 220px; }
 .more-btn { margin: 22px auto 0; display: flex; }
+.city-shot { margin: 18px 0 0; border-radius: 16px; overflow: hidden; background: var(--bg); }
+.city-shot img { width: 100%; display: block; }
+.city-shot figcaption { padding: 10px 14px; font-size: 14px; }
+.prose a { color: var(--orange-dark); font-weight: 600; }
