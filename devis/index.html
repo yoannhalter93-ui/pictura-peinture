@@ -276,8 +276,8 @@ html { scroll-behavior: smooth; }
     plafond_neuf: [25, 25, 25],                  // plafond plaque neuve : ponçage, impression + 2 couches                     // bandes et joints sur plaque de plâtre neuve
     murs_pret: [20, 22, 25],                     // murs 2 couches, support prêt
     plafonds_pret: [22, 25, 28],                 // plafonds 2 couches, support prêt
-    murs_prep: [23, 26, 30],                     // murs avec préparation légère
-    plafonds_prep: [26, 29, 33],                 // plafonds avec préparation légère
+    murs_prep: [20, 26, 30],                     // murs avec préparation légère
+    plafonds_prep: [24, 29, 33],                 // plafonds avec préparation légère
     ratissage_seul: [14, 16, 18],
     murs_ratissage: [36, 40, 45],                // ratissage + impression + 2 couches murs
     plafonds_ratissage: [40, 45, 50],            // ratissage + impression + 2 couches plafonds
@@ -425,7 +425,7 @@ html { scroll-behavior: smooth; }
     if (sf.etat === 'placo') return sf.type === 'mur'
       ? [['bandes_placo', 'mur_neuf'], 'plaque neuve : bandes, ponçage, impression + 2 couches']
       : [['bandes_placo', 'plafond_neuf'], 'plaque neuve : bandes, ponçage, impression + 2 couches'];
-    if (sf.etat === 'prep') return [[z + '_prep'], '2 couches, préparation légère'];
+    if (sf.etat === 'prep') return [[z + '_prep'], 'reprise des défauts, ponçage, impression + 2 couches'];
     return [[z + '_pret'], '2 couches, support prêt'];
   }
   function lignesPieces() {
@@ -439,7 +439,7 @@ html { scroll-behavior: smooth; }
         const lib = (sf.type === 'mur' ? 'Mur ' : 'Plafond ') + (pc.surfaces.filter(x => x.type === sf.type).length > 1 ? n : '').toString();
         const [cles, info] = prixSurface(sf);
         out.push({ titre: `${nom} · ${lib.trim()} · ${sf.m2} m²`, info, t: [0, 1, 2].map(k => cles.reduce((t, c) => t + TARIFS[c][k], 0) * sf.m2) });
-        ['lessivage', 'poncage', 'depose_papier', 'depose_toile'].filter(c => sf[c] && (sf.type === 'mur' || c === 'lessivage' || c === 'poncage'))
+        ['lessivage', 'poncage', 'depose_papier', 'depose_toile'].filter(c => sf[c] && (sf.type === 'mur' || c === 'lessivage' || c === 'poncage') && (c !== 'poncage' || sf.etat === 'bon'))
           .forEach(c => out.push(L(`${nom} · ${LIBELLES[c]}`, `${lib.trim().toLowerCase()}, ${sf.m2} m²`, c, sf.m2)));
       });
     });
@@ -464,7 +464,7 @@ html { scroll-behavior: smooth; }
             ${sf.type === 'mur' ? `<label class="field"><span>Finition</span><select data-p="${i}" data-s="${j}" data-f="finition">${opt([['peinture', 'Peinture'], ['toile', 'Toile de verre + peinture']], sf.finition)}</select></label>` : ''}
           </div>
           <fieldset class="choices small"><legend class="sr">En plus</legend>
-            ${chip(i, j, 'lessivage', 'Lessivage', sf.lessivage)}${chip(i, j, 'poncage', 'Ponçage', sf.poncage)}
+            ${chip(i, j, 'lessivage', 'Lessivage', sf.lessivage)}${sf.etat === 'bon' ? chip(i, j, 'poncage', 'Ponçage', sf.poncage) : ''}
             ${sf.type === 'mur' ? chip(i, j, 'depose_papier', 'Retirer papier peint', sf.depose_papier) + chip(i, j, 'depose_toile', 'Retirer toile de verre', sf.depose_toile) : ''}
           </fieldset>
           ${pc.surfaces.length > 1 ? `<button type="button" class="lien-suppr" data-act="suppr-surf" data-p="${i}" data-s="${j}">Retirer</button>` : ''}
@@ -484,8 +484,8 @@ html { scroll-behavior: smooth; }
     if (el.type === 'checkbox') sf[f] = el.checked;
     else if (f === 'm2') sf.m2 = Math.max(0, Math.round(parseFloat(String(el.value).replace(',', '.')) || 0));
     else sf[f] = el.value;
-    // Imperfections : le ponçage est coché d'office (décochable)
-    if (f === 'etat') sf.poncage = el.value === 'prep';
+    // Ponçage inclus dans « petites imperfections » et « plaque neuve »
+    if (f === 'etat' && (el.value === 'prep' || el.value === 'placo')) sf.poncage = false;
     return f === 'type' || f === 'etat';
   }
 
