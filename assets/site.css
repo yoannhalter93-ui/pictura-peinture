@@ -154,3 +154,12 @@ footer a { color: #fff; }
 .shot.wide { grid-column: 1 / -1; }
 .shot.wide > a { aspect-ratio: 21 / 9; }
 @media (max-width: 560px) { .shot.wide > a { aspect-ratio: 4 / 3; } }
+.ba-3 .ba-pair { grid-template-columns: 1fr 1fr 1fr; }
+.ba-3 .ba-side { aspect-ratio: 9 / 16; }
+.ba-land .ba-side { aspect-ratio: 1 / 1; }
+.tag-mid { background: var(--sage-dark); }
+.shot.land { grid-column: span 2; }
+.shot.land > a { aspect-ratio: 8 / 5; }
+@media (max-width: 560px) { .shot.land { grid-column: auto; } .shot.land > a { aspect-ratio: 4 / 3; } }
+.ba .ba-pair { flex: 1; }
+.ba-land .ba-side { aspect-ratio: auto; min-height: 220px; }

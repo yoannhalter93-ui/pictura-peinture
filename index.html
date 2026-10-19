@@ -351,23 +351,36 @@
 
 <script>
   // Photos de chantiers (dossier « realisations »).
-  // Une photo : { src, titre }   ·   Un avant/après : { avant, apres, titre }
+  // Une photo : { src, titre, paysage? }   ·   Un avant/après : { avant, pendant?, apres, titre, paysage? }
+  const R = 'realisations/';
   const REALISATIONS = [
-    { avant: 'realisations/bardage-avant.jpg', apres: 'realisations/bardage-apres.jpg', titre: 'Bardage bois : décapage et remise en peinture' },
-    { avant: 'realisations/terrasse-avant.jpg', apres: 'realisations/terrasse-apres.jpg', titre: 'Terrasse bois : rénovation complète' },
-    { src: 'realisations/couloir-vert.jpg', titre: 'Couloir : boiseries en vert profond' },
-    { src: 'realisations/palier-escalier.jpg', titre: 'Palier : murs, plafond rampant et rampe' },
-    { src: 'realisations/entree-vert-blanc.jpg', titre: 'Entrée : murs blancs et boiseries vertes' },
-    { src: 'realisations/chambre-papier-peint.jpg', titre: 'Chambre : pose de papier peint' },
-    { src: 'realisations/facade-maison.jpg', titre: 'Façade : peinture extérieure', large: true },
+    { avant: R + 'escalier-ancien-avant.jpg', pendant: R + 'escalier-ancien-pendant.jpg', apres: R + 'escalier-ancien-apres.jpg', titre: 'Escalier ancien : décapage, teinte et vernis' },
+    { avant: R + 'cuisine-avant.jpg', apres: R + 'cuisine-apres.jpg', titre: 'Cuisine : murs remis à neuf et faïence repeinte', paysage: true },
+    { avant: R + 'parquet-avant.jpg', apres: R + 'parquet-apres.jpg', titre: 'Parquet bâtons rompus : ponçage et vitrification' },
+    { avant: R + 'sdb-avant.jpg', apres: R + 'sdb-apres.jpg', titre: 'Salle de bain : finitions peinture sur placo neuf', paysage: true },
+    { avant: R + 'bardage-avant.jpg', apres: R + 'bardage-apres.jpg', titre: 'Bardage bois : décapage et remise en peinture', paysage: true },
+    { avant: R + 'terrasse-avant.jpg', apres: R + 'terrasse-apres.jpg', titre: 'Terrasse bois : rénovation complète' },
+    { src: R + 'couloir-vert.jpg', titre: 'Couloir : boiseries en vert profond' },
+    { src: R + 'salon-arches.jpg', titre: 'Salon : peinture décorative en arches', paysage: true },
+    { src: R + 'palier-escalier.jpg', titre: 'Palier : murs, plafond rampant et rampe' },
+    { src: R + 'escalier-anthracite.jpg', titre: 'Escalier : marches et contremarches anthracite' },
+    { src: R + 'bureau-rayures.jpg', titre: 'Coin bureau : rayures peintes bordeaux et blanc', paysage: true },
+    { src: R + 'mur-terracotta.jpg', titre: 'Chambre : mur d\'accent terracotta' },
+    { src: R + 'palier-anthracite.jpg', titre: 'Palier et escalier : finition anthracite' },
+    { src: R + 'chambre-vert-sauge.jpg', titre: 'Chambre : mur d\'accent vert sauge', paysage: true },
+    { src: R + 'parement-pierre.jpg', titre: 'Séjour : pose de parement pierre', paysage: true },
+    { src: R + 'entree-vert-blanc.jpg', titre: 'Entrée : murs blancs et boiseries vertes', paysage: true },
+    { src: R + 'chambre-papier-peint.jpg', titre: 'Chambre : pose de papier peint' },
+    { src: R + 'facade-maison.jpg', titre: 'Façade : peinture extérieure', large: true },
   ];
   const g = document.getElementById('gallery');
   const esc = t => t.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const img = (src, alt) => `<a href="${src}" target="_blank" rel="noopener"><img src="${src}" alt="${esc(alt)}" loading="lazy"></a>`;
+  const side = (src, titre, etiquette, cls = '') => `<div class="ba-side">${img(src, titre + ', ' + etiquette.toLowerCase())}<span class="tag ${cls}">${etiquette}</span></div>`;
   if (REALISATIONS.length) {
     g.innerHTML = REALISATIONS.map(r => r.avant
-      ? `<figure class="ba"><div class="ba-pair"><div class="ba-side">${img(r.avant, r.titre + ', avant')}<span class="tag">Avant</span></div><div class="ba-side">${img(r.apres, r.titre + ', après')}<span class="tag tag-after">Après</span></div></div><figcaption>${esc(r.titre)}</figcaption></figure>`
-      : `<figure class="shot${r.large ? ' wide' : ''}">${img(r.src, r.titre)}<figcaption>${esc(r.titre)}</figcaption></figure>`).join('');
+      ? `<figure class="ba${r.pendant ? ' ba-3' : ''}${r.paysage ? ' ba-land' : ''}"><div class="ba-pair">${side(r.avant, r.titre, 'Avant')}${r.pendant ? side(r.pendant, r.titre, 'Pendant', 'tag-mid') : ''}${side(r.apres, r.titre, 'Après', 'tag-after')}</div><figcaption>${esc(r.titre)}</figcaption></figure>`
+      : `<figure class="shot${r.large ? ' wide' : r.paysage ? ' land' : ''}">${img(r.src, r.titre)}<figcaption>${esc(r.titre)}</figcaption></figure>`).join('');
   } else {
     g.hidden = true;
   }
