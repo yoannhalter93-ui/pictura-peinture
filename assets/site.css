@@ -163,3 +163,4 @@ footer a { color: #fff; }
 @media (max-width: 560px) { .shot.land { grid-column: auto; } .shot.land > a { aspect-ratio: 4 / 3; } }
 .ba .ba-pair { flex: 1; }
 .ba-land .ba-side { aspect-ratio: auto; min-height: 220px; }
+.more-btn { margin: 22px auto 0; display: flex; }

@@ -240,7 +240,7 @@
       <article class="service">
         <span class="chip" style="background: var(--orange)"></span>
         <h3>Revêtements muraux</h3>
-        <ul><li>Ratissage complet</li><li>Toile de verre</li><li>Papier peint et panoramique</li><li>Dépose des anciens revêtements</li></ul>
+        <ul><li>Ratissage complet</li><li>Enduits décoratifs</li><li>Toile de verre</li><li>Papier peint et panoramique</li><li>Dépose des anciens revêtements</li></ul>
         <a class="more" href="/devis/">Estimer ces travaux →</a>
       </article>
       <article class="service">
@@ -360,12 +360,27 @@
   const R = 'realisations/';
   const REALISATIONS = [
     { avant: R + 'escalier-ancien-avant.jpg', pendant: R + 'escalier-ancien-pendant.jpg', apres: R + 'escalier-ancien-apres.jpg', titre: 'Escalier ancien à Vonnas : décapage, teinte et vernis' },
+    { avant: R + 'escalier-blanc-avant.jpg', apres: R + 'escalier-blanc-apres.jpg', titre: 'Escalier bois : du vernis foncé au blanc et taupe' },
+    { avant: R + 'chambre-graffiti-avant.jpg', apres: R + 'chambre-graffiti-apres.jpg', titre: 'Chambre ado : bandes et enduits sur placo, peinture et papier peint panoramique', paysage: true },
     { avant: R + 'cuisine-avant.jpg', apres: R + 'cuisine-apres.jpg', titre: 'Cuisine à Jassans-Riottier : murs remis à neuf et faïence repeinte', paysage: true },
     { avant: R + 'parquet-avant.jpg', apres: R + 'parquet-apres.jpg', titre: 'Parquet bâtons rompus : ponçage et vitrification' },
     { avant: R + 'sdb-avant.jpg', apres: R + 'sdb-apres.jpg', titre: 'Salle de bain à Villefranche-sur-Saône : pose des revêtements muraux et du sol, peinture', paysage: true },
     { avant: R + 'bardage-avant.jpg', apres: R + 'bardage-apres.jpg', titre: 'Bardage bois : décapage et remise en peinture', paysage: true },
     { avant: R + 'terrasse-avant.jpg', apres: R + 'terrasse-apres.jpg', titre: 'Terrasse bois : rénovation complète' },
     { src: R + 'couloir-vert.jpg', titre: 'Couloir : boiseries en vert profond' },
+    { src: R + 'sejour-bleu-nuit.jpg', titre: 'Séjour : mur et meubles intégrés bleu nuit', paysage: true },
+    { src: R + 'sdb-jaune.jpg', titre: 'Salle d\'eau : mur d\'accent jaune' },
+    { src: R + 'bibliotheque-bleue.jpg', titre: 'Bibliothèque sur mesure : peinture bleu canard', paysage: true },
+    { src: R + 'couloir-bande-bleue.jpg', titre: 'Couloir : bande décorative en enduit bleu' },
+    { src: R + 'mur-enduit-bleu.jpg', titre: 'Chambre : enduit décoratif bleu', paysage: true },
+    { src: R + 'cuisine-enduit-vert.jpg', titre: 'Cuisine : enduit décoratif vert', paysage: true },
+    { src: R + 'sdb-bleu-chevrons.jpg', titre: 'Salle de bain : bleu outremer et faïence à chevrons', paysage: true },
+    { src: R + 'chambre-rouge.jpg', titre: 'Chambre : mur d\'accent rouge', paysage: true },
+    { src: R + 'chambre-geometrique.jpg', titre: 'Chambre : peinture géométrique en bleus', paysage: true },
+    { src: R + 'dressing-bleu-nuit.jpg', titre: 'Chambre : façades de dressing en bleu nuit', paysage: true },
+    { src: R + 'combles-noir.jpg', titre: 'Combles : murs noirs mats et plafond blanc', paysage: true },
+    { src: R + 'coin-repas-bordeaux.jpg', titre: 'Coin repas : soubassement bordeaux', paysage: true },
+    { src: R + 'sejour-gris-bleu.jpg', titre: 'Séjour : murs gris-bleu et plafond blanc', paysage: true },
     { src: R + 'salon-arches.jpg', titre: 'Salon à Gleizé : peinture décorative en arches', paysage: true },
     { src: R + 'palier-escalier.jpg', titre: 'Palier : murs, plafond rampant et rampe' },
     { src: R + 'escalier-anthracite.jpg', titre: 'Escalier en béton ciré anthracite' },
@@ -386,6 +401,16 @@
     g.innerHTML = REALISATIONS.map(r => r.avant
       ? `<figure class="ba${r.pendant ? ' ba-3' : ''}${r.paysage ? ' ba-land' : ''}"><div class="ba-pair">${side(r.avant, r.titre, 'Avant')}${r.pendant ? side(r.pendant, r.titre, 'Pendant', 'tag-mid') : ''}${side(r.apres, r.titre, 'Après', 'tag-after')}</div><figcaption>${esc(r.titre)}</figcaption></figure>`
       : `<figure class="shot${r.large ? ' wide' : r.paysage ? ' land' : ''}">${img(r.src, r.titre)}<figcaption>${esc(r.titre)}</figcaption></figure>`).join('');
+    // Au-delà de 14 chantiers, la suite s'affiche avec le bouton « Voir plus »
+    const LIMITE = 14, items = [...g.children];
+    if (items.length > LIMITE) {
+      items.slice(LIMITE).forEach(f => f.hidden = true);
+      const b = document.createElement('button');
+      b.className = 'btn btn-line more-btn'; b.type = 'button';
+      b.textContent = `Voir les ${items.length - LIMITE} autres chantiers`;
+      b.addEventListener('click', () => { items.forEach(f => f.hidden = false); b.remove(); });
+      g.after(b);
+    }
   } else {
     g.hidden = true;
   }
