@@ -230,7 +230,7 @@
       <article class="service">
         <span class="chip" style="background: var(--sage)"></span>
         <h3>Extérieur et ravalement</h3>
-        <ul><li>Façades et ravalement</li><li>Volets et fenêtres bois</li><li>Garde-corps de balcon</li><li>Portails et boiseries extérieures</li></ul>
+        <ul><li>Façades et ravalement</li><li>Volets et fenêtres bois</li><li>Garde-corps de balcon</li><li>Bardages et terrasses bois</li></ul>
         <a class="more" href="/devis/">Estimer ces travaux →</a>
       </article>
       <article class="service">
@@ -350,12 +350,24 @@
 <div class="float-cta"><a class="btn btn-orange" href="/devis/">Estimer mes travaux en 2 min →</a></div>
 
 <script>
-  // Photos de chantiers : ajoutez les fichiers dans le dossier « realisations »
-  // puis une ligne ici, par exemple { src: 'realisations/salon-lyon.jpg', titre: 'Salon, ratissage + peinture' }
-  const REALISATIONS = [];
+  // Photos de chantiers (dossier « realisations »).
+  // Une photo : { src, titre }   ·   Un avant/après : { avant, apres, titre }
+  const REALISATIONS = [
+    { avant: 'realisations/bardage-avant.jpg', apres: 'realisations/bardage-apres.jpg', titre: 'Bardage bois : décapage et remise en peinture' },
+    { avant: 'realisations/terrasse-avant.jpg', apres: 'realisations/terrasse-apres.jpg', titre: 'Terrasse bois : rénovation complète' },
+    { src: 'realisations/couloir-vert.jpg', titre: 'Couloir : boiseries en vert profond' },
+    { src: 'realisations/palier-escalier.jpg', titre: 'Palier : murs, plafond rampant et rampe' },
+    { src: 'realisations/entree-vert-blanc.jpg', titre: 'Entrée : murs blancs et boiseries vertes' },
+    { src: 'realisations/chambre-papier-peint.jpg', titre: 'Chambre : pose de papier peint' },
+    { src: 'realisations/facade-maison.jpg', titre: 'Façade : peinture extérieure', large: true },
+  ];
   const g = document.getElementById('gallery');
+  const esc = t => t.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const img = (src, alt) => `<a href="${src}" target="_blank" rel="noopener"><img src="${src}" alt="${esc(alt)}" loading="lazy"></a>`;
   if (REALISATIONS.length) {
-    g.innerHTML = REALISATIONS.map(r => `<figure><img src="${r.src}" alt="${r.titre}" loading="lazy"><figcaption>${r.titre}</figcaption></figure>`).join('');
+    g.innerHTML = REALISATIONS.map(r => r.avant
+      ? `<figure class="ba"><div class="ba-pair"><div class="ba-side">${img(r.avant, r.titre + ', avant')}<span class="tag">Avant</span></div><div class="ba-side">${img(r.apres, r.titre + ', après')}<span class="tag tag-after">Après</span></div></div><figcaption>${esc(r.titre)}</figcaption></figure>`
+      : `<figure class="shot${r.large ? ' wide' : ''}">${img(r.src, r.titre)}<figcaption>${esc(r.titre)}</figcaption></figure>`).join('');
   } else {
     g.hidden = true;
   }
