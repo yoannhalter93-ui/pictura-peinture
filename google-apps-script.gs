@@ -28,6 +28,10 @@ function doPost(e) {
     if (!nom || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || tel.replace(/\D/g, '').length < 10) {
       return json({ ok: false, erreur: 'coordonnées incomplètes' });
     }
+    // Anti-robots : champ piège rempli ou formulaire envoyé en moins de 5 secondes → ignoré sans prévenir
+    if (texte(d.site, 200) || Number(d.t) < 5000) return json({ ok: true });
+    // Trop de demandes (même e-mail, ou rafale sur le site) → ignoré
+    if (tropDeDemandes(email)) return json({ ok: true });
     const lignes = (Array.isArray(d.lignes) ? d.lignes : []).slice(0, 40).map(l => ({
       titre: texte(l.titre, 80), info: texte(l.info, 120),
       total: l.total == null ? null : Math.max(0, Math.round(Number(l.total) || 0)),
@@ -37,6 +41,7 @@ function doPost(e) {
     const normal = Math.max(0, Math.round(Number(d.normal) || 0));
     if (!lignes.length) return json({ ok: false, erreur: 'estimation vide' });
     const ville = texte(d.ville, 80);
+    const suspect = estSuspect(nom, ville, tel, lignes);
     const precisions = texte(d.precisions, 1500);
     const fourchette = normal
       ? `environ ${euros(normal)} HT (entre ${euros(min)} et ${euros(max)} HT)`
@@ -47,7 +52,7 @@ function doPost(e) {
       to: ENTREPRISE.email,
       replyTo: email,
       name: 'Site ' + ENTREPRISE.nom,
-      subject: `Demande de devis : ${nom}${normal ? ` (≈ ${euros(normal)} HT)` : ''}`,
+      subject: `${suspect ? '[Suspect, sans doute un robot] ' : ''}Demande de devis : ${nom}${normal ? ` (≈ ${euros(normal)} HT)` : ''}`,
       htmlBody: cadre(`
         <h2 style="margin:0 0 12px;color:${SAUGE}">Nouvelle demande de devis</h2>
         <table style="border-collapse:collapse;font-size:15px">
@@ -59,8 +64,8 @@ function doPost(e) {
         <p style="margin:16px 0 0;color:#676d60;font-size:13px">Répondez à cet e-mail pour écrire directement au client.</p>`),
     });
 
-    // 2. Au client
-    MailApp.sendEmail({
+    // 2. Au client (jamais pour une demande suspecte : évite d'envoyer des e-mails à des inconnus)
+    if (!suspect) MailApp.sendEmail({
       to: email,
       replyTo: ENTREPRISE.email,
       name: ENTREPRISE.nom,
@@ -78,6 +83,26 @@ function doPost(e) {
   } catch (err) {
     return json({ ok: false, erreur: String(err) });
   }
+}
+
+// Nom ou ville en lettres au hasard, numéro non français, surfaces irréalistes
+function estSuspect(nom, ville, tel, lignes) {
+  const charabia = t => !/\s/.test(t) && t.length >= 10 && (t.slice(1).match(/[A-Z]/g) || []).length >= 3;
+  const num = tel.replace(/[\s.\-()]/g, '').replace(/^\+33/, '0').replace(/^0033/, '0');
+  const telFr = /^0[1-9]\d{8}$/.test(num);
+  const tropGrand = lignes.some(l => { const m = /(\d+)\s*m²/.exec(l.titre); return m && Number(m[1]) > 1000; });
+  return charabia(nom) || charabia(ville) || !telFr || tropGrand;
+}
+
+// Au plus 3 demandes par e-mail en 6 h, et 20 demandes par heure en tout
+function tropDeDemandes(email) {
+  const cache = CacheService.getScriptCache();
+  const cle = 'mail_' + email.toLowerCase(), n = Number(cache.get(cle) || 0);
+  const tot = Number(cache.get('total') || 0);
+  if (n >= 3 || tot >= 20) return true;
+  cache.put(cle, String(n + 1), 6 * 3600);
+  cache.put('total', String(tot + 1), 3600);
+  return false;
 }
 
 /** Lancez cette fonction une fois depuis l'éditeur pour autoriser l'envoi d'e-mails. */

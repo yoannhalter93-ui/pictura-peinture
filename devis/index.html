@@ -116,6 +116,7 @@ textarea { min-height: 80px; resize: vertical; }
 .choices input:focus-visible + span { outline: 3px solid var(--orange); outline-offset: 2px; }
 
 .card.off .body { display: none; }
+.piege { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .piece { border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; background: var(--bg); }
 .piece-head { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
 .piece-nom { flex: 1 1 200px; }
@@ -221,6 +222,7 @@ html { scroll-behavior: smooth; }
             <label class="field"><span>Ville des travaux</span><input type="text" id="ville" autocomplete="address-level2"></label>
             <label class="field"><span>E-mail</span><input type="email" id="email" name="email" autocomplete="email" required></label>
             <label class="field"><span>Téléphone</span><input type="tel" id="tel" autocomplete="tel" required></label>
+            <label class="piege" aria-hidden="true">Site web (laisser vide)<input type="text" id="site" name="site" tabindex="-1" autocomplete="off"></label>
           </div>
           <label class="field"><span>Précisions (facultatif)</span><textarea id="message" placeholder="Nombre de pièces, hauteur sous plafond, délais souhaités…"></textarea></label>
           <p class="mini-est" id="mini-est"></p>
@@ -459,7 +461,7 @@ html { scroll-behavior: smooth; }
         <div class="surf">
           <div class="surf-grid">
             <label class="field"><span>Type</span><select data-p="${i}" data-s="${j}" data-f="type">${opt([['mur', 'Mur'], ['plafond', 'Plafond']], sf.type)}</select></label>
-            <label class="field"><span>Surface</span><span class="unit" data-unit="m²"><input type="number" min="0" step="1" inputmode="decimal" data-p="${i}" data-s="${j}" data-f="m2" value="${sf.m2 || ''}"></span></label>
+            <label class="field"><span>Surface</span><span class="unit" data-unit="m²"><input type="number" min="0" step="1" inputmode="decimal" data-p="${i}" data-s="${j}" data-f="m2" max="1000" value="${sf.m2 || ''}"></span></label>
             <label class="field surf-etat"><span>État</span><select data-p="${i}" data-s="${j}" data-f="etat">${opt(ETATS, sf.etat)}</select></label>
             ${sf.type === 'mur' ? `<label class="field"><span>Finition</span><select data-p="${i}" data-s="${j}" data-f="finition">${opt([['peinture', 'Peinture'], ['toile', 'Toile de verre + peinture']], sf.finition)}</select></label>` : ''}
           </div>
@@ -482,12 +484,16 @@ html { scroll-behavior: smooth; }
     if (el.dataset.s === undefined) { pc[f] = el.value; return false; }
     const sf = pc.surfaces[+el.dataset.s];
     if (el.type === 'checkbox') sf[f] = el.checked;
-    else if (f === 'm2') sf.m2 = Math.max(0, Math.round(parseFloat(String(el.value).replace(',', '.')) || 0));
+    else if (f === 'm2') sf.m2 = Math.min(MAX_QTE, Math.max(0, Math.round(parseFloat(String(el.value).replace(',', '.')) || 0)));
     else sf[f] = el.value;
     // Ponçage inclus dans « petites imperfections » et « plaque neuve »
     if (f === 'etat' && (el.value === 'prep' || el.value === 'placo')) sf.poncage = false;
     return f === 'type' || f === 'etat';
   }
+
+  const OUVERTURE = Date.now();
+  // Surfaces et quantités plafonnées : au-delà, ce n'est plus une estimation en ligne
+  const MAX_QTE = 1000;
 
   // Dans un aperçu encadré (ex. lien claude.ai), l'envoi est désactivé
   let APERCU = true; try { APERCU = window.self !== window.top; } catch {}
@@ -522,7 +528,7 @@ html { scroll-behavior: smooth; }
     if (p.custom) return v;
     for (const c of p.champs) {
       const id = `${p.id}-${c.id}`;
-      if (c.type === 'qte') v[c.id] = Math.max(0, Math.round(parseFloat(String($(id).value).replace(',', '.')) || 0));
+      if (c.type === 'qte') v[c.id] = Math.min(MAX_QTE, Math.max(0, Math.round(parseFloat(String($(id).value).replace(',', '.')) || 0)));
       else if (c.type === 'coche') v[c.id] = $(id).checked;
       else v[c.id] = document.querySelector(`input[name="${id}"]:checked`)?.value;
     }
@@ -605,8 +611,9 @@ html { scroll-behavior: smooth; }
     const e = compute();
     const nom = $('nom').value.trim(), email = $('email').value.trim(), tel = $('tel').value.trim();
     if (!e.base && !e.lignes.length) { status.textContent = 'Choisissez au moins un type de travaux.'; status.classList.add('err'); return; }
-    if (!nom || !/^\S+@\S+\.\S+$/.test(email) || tel.replace(/\D/g, '').length < 10) {
-      status.textContent = 'Indiquez votre nom, un e-mail valide et un numéro de téléphone (10 chiffres).';
+    const telFr = tel.replace(/[\s.\-()]/g, '').replace(/^\+33/, '0').replace(/^0033/, '0');
+    if (!nom || !/^\S+@\S+\.\S+$/.test(email) || !/^0[1-9]\d{8}$/.test(telFr)) {
+      status.textContent = 'Indiquez votre nom, un e-mail valide et un numéro de téléphone français (ex. 06 12 34 56 78).';
       status.classList.add('err'); return;
     }
     if (!ENTREPRISE.email || APERCU) {
@@ -621,7 +628,7 @@ html { scroll-behavior: smooth; }
         // Corps en texte brut : évite la requête préalable CORS que Google refuse
         const res = await fetch(ENTREPRISE.envoiUrl, {
           method: 'POST',
-          body: JSON.stringify({ nom, email, telephone: tel, ville, precisions, min: e.min, normal: e.normal, max: e.max,
+          body: JSON.stringify({ nom, email, telephone: tel, ville, precisions, site: $('site').value, t: Date.now() - OUVERTURE, min: e.min, normal: e.normal, max: e.max,
             lignes: e.lignes.map(l => ({ titre: l.titre, info: l.info, total: l.t ? l.t[0] : null })) }),
         });
         const r = await res.json();
